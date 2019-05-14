@@ -29,17 +29,15 @@ class Authentication extends CI_Controller {
 			$this->session->set_userdata('nama_user', $row->nama_user);
 			$this->session->set_userdata('id_user', $row->id_user);
 			
-			if($this->session->userdata('id_role') == 4){
-				redirect('Admin/index');
-			}
-			elseif($this->session->userdata('id_role') == 1){
+
+			if($this->session->userdata('id_role') == 1){
 				redirect('Pemodal/index');
 			}
 			elseif($this->session->userdata('id_role') == 2){
 				redirect('Peminjam/index');
 			}
 			elseif($this->session->userdata('id_role') == 3){
-				redirect('Petugas/index');
+				redirect('Admin/index');
 			}
 		}else{
 			$data['error_message'] = "Username atau Password tidak sesuai";

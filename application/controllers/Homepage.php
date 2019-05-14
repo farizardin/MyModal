@@ -10,9 +10,9 @@ class Homepage extends CI_Controller {
 
 	public function index()
 	{
-		$this->load->model('Berita_model');	
-		$data["getBerita"] = $this->Berita_model->getBerita();
-		$this->load->view('Homepage/index.php', $data);		
+		// $this->load->model('Berita_model');	
+		// $data["getBerita"] = $this->Berita_model->getBerita();
+		$this->load->view('Homepage/index.php');		
 	}
 
 	public function Profile()

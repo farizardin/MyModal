@@ -2,7 +2,6 @@
 <html>
 <head>
 <?php require_once(dirname(dirname(__FILE__)) . '/Include/header.php'); ?>
-<?php require_once(dirname(dirname(__FILE__)) . '/Peminjam/navbar_peminjam.php'); ?>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -15,12 +14,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Konfirmasi Proposal</h1>
+                <h1>Proposal Diterima</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Konfirmasi Proposal</li>
+                <li class="breadcrumb-item active">Proposal Diterima</li>
                 </ol>
             </div>
             </div>
@@ -84,7 +83,7 @@
                     </div>
                 <?php } ?>
                 <div class="card-header">
-                <h3 class="card-title">Konfirmasi Proposal</h3>
+                <h3 class="card-title">Proposal Diterima</h3>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
@@ -104,23 +103,25 @@
                        <td style="vertical-align:middle;"><?php echo $i; ?></td>
                         <td style=" text-align:left; ">
                             <p>
-                                <b>NAMA</b>: <?php echo $row->user?><br>
-                                <b>NRP</b>: <?php echo $row->usrname?><br>
-                                <b>JUDUL</b>: <?php echo $row->judul?><br>
-                                <b>BIDANG</b>: <?php echo $row->nama?><br>
-                                <b>STATUS</b>: <i><?php echo $row->status
-                                ?></i><br>
+                                <b>PERIHAL</b>: <?php echo $row->judul?><br>
+                                <b>STATUS</b>: <?php echo $row->statname?><i></i><br>
+                                <b>PERMINTAAN DANA</b>: <?php echo $row->dana?><br>
+                                <b>Foto KTP</b>: <a target="_blank" href="<?php echo base_url($row->fileKtp);?>">Lihat KTP</a><br>
+                                <b>File Proposal</b>: <a href="<?php echo base_url($row->fileProp);?>" download>Download Proposal</a><br>
+                                <b>Laporan Keuangan</b>: <a href="<?php echo base_url($row->fileLap);?>" download>Download Laporan Keuangan</a><br><p>
+                                <b>Catatan</b>: <?php echo $row->catatan?><br>
+                                <b>Isi</b>: <?php echo $row->isi?><br>
                             </p>
                         </td>
                         <td style="vertical-align:middle;">
-                            <?php echo $row->keterangan ?>
+                            <?php echo $row->abstrak ?>
                         </td>
                         <td style="vertical-align:middle; ">
                         <form method="post" action="<?php echo site_url('Mahasiswa/DetailProposal')?>">
                                 <input type="hidden" name="id_proposal" value="<?php echo $row->id?>">
+                                <a onclick="proposalConfirm('<?php echo site_url('Peminjam/ConfirmPeminjam/'.$row->id) ?>')" href="#!" style="border-radius:0px !important;" class="btn btn-success btn-sm"></i>Kembalikan</a>
                                 <button type="submit" class="btn btn-primary btn-sm" style="border-radius:0px !important;" title="Detail">Detail </button>
-                            </form>
-                                
+                            </form>  
                         </td>
                     </tr>
                     <?php $i++;} ?>   
@@ -131,21 +132,41 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Proposal</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Kembalikan Modal</h5>
                             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                             </button>
                         </div>
-                        <div class="modal-body">Apakah anda yakin untuk mengkonfirmasi proposal ini?</div>
-                        <div class="modal-footer">
-                            <a id="btn-confirm" class="btn btn-primary" href="#">Konfirmasi</a>
-                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                        </div>
+                    <div class="modal-body">Kembalikan Modal</div>
+                        <form id="msform" class="form-group" action="" method="post" enctype="multipart/form-data">
+            <!-- fieldsets -->
+                            <div class="row" style="margin-left:2rem;padding-bottom:1rem;">
+                                <div class="col-5">
+                                    <input type="number" required id="dana_setuju" placeholder="Dana Kembali" name="kembali" class="form-control aspect_list" style="border-radius:0px !important;">
+                                </div>
+                            </div>
+                            <div class="row" style="margin-left:2rem;padding-bottom:1rem;">
+                                <div class="col-5">
+                                    <input type="number" id="Judulcatatan" placeholder="Keuntungan" name="keuntungan" class="form-control aspect_list" style="border-radius:0px !important;">
+                                </div>
+                            </div>
+                            <div class="row" style="margin-left:2rem;padding-bottom:1rem;">
+                                <div class="col-5">
+                                    Bukti Transfer
+                                    <input type="file" id="bukti" placeholder="Bukti Transfer" name="bukti" class="form-control aspect_list" style="border-radius:0px !important;">
+                                </div>
+                            </div>
+                            <div class="row" style="margin-left:2rem;padding-bottom:1rem;">
+                                <div class="col-5">
+                                <input type="submit" name="submit" id="btn-confirm" class="btn btn-primary" value="Terima">
+                                        <button style="margin-left:2rem;" class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button> 
+                                </div>
+                            </div>
+                            </form>
                         </div>
                     </div>
-                </div>
+                    
                 <!-- /.card-body -->
-            </div>
             <!-- /.card -->
             </div>
             <!-- /.col -->
@@ -167,7 +188,7 @@
     <script>
     
     function proposalConfirm(url){
-        $('#btn-confirm').attr('href', url);
+        $('#msform').attr('action', url);
         $('#confirmModal').modal();
     }
 </script>

@@ -7,7 +7,6 @@
 <div class="wrapper">
 
   <!-- Navbar -->
-  <?php require_once 'Petugas/navbar_petugas.php' ?>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" style="min-height: 450px !important;">

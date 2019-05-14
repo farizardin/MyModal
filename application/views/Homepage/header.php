@@ -39,26 +39,27 @@
      </div>
      <div class="collapse navbar-collapse" id="navbarSupportedContent">
          <ul class="navbar-nav nav-dropdown ml-auto" data-app-modern-menu="true">
-             <li class="nav-item">
-               <a class="nav-link link text-primary display-4" href="<?php echo site_url("Homepage"); ?>">HOME</a>
-             </li>
-             <li class="nav-item">
-               <a class="nav-link link text-primary display-4" href="<?php echo site_url("Homepage/News"); ?>">&nbsp;BERITA</a>
-             </li>
-             <li class="nav-item">
-               <a class="nav-link link text-primary display-4" href="<?php echo site_url("Homepage/Download"); ?>">DOWNLOAD</a>
-             </li>
-             <li class="nav-item">
-               <a class="nav-link link text-primary display-4" href="<?php  echo site_url("Homepage/Gallery"); ?>">GALERI</a>
-             </li>
          </ul>
-
-              
-         <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-7" href="<?php echo site_url("Authentication"); ?>" target="_blank"><span class="mbri-user mbr-iconfont mbr-iconfont-btn"></span>&nbsp;Login</a></div>
+          <?php if(!$this->session->id_role) {
+            echo '<div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-7" href="'.site_url("Authentication").'" target="_blank"><span class="mbri-user mbr-iconfont mbr-iconfont-btn"></span>&nbsp;Login</a></div>';
+          }else{
+            switch ($this->session->id_role) {
+    
+              case 1:
+              echo '<div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-7" href="'.site_url("Pemodal").'" target="_blank"><span class="mbri-user mbr-iconfont mbr-iconfont-btn"></span>&nbsp;Dashboard</a></div>';
+                break;
+              case 2:
+              echo '<div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-7" href="'.site_url("Peminjam").'" target="_blank"><span class="mbri-user mbr-iconfont mbr-iconfont-btn"></span>&nbsp;Dashboard</a></div>';
+                break;
+              case 3:
+              echo '<div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-7" href="'.site_url("Admin").'" target="_blank"><span class="mbri-user mbr-iconfont mbr-iconfont-btn"></span>&nbsp;Dashboard</a></div>';
+                break;
+            }
+          }
+          ?>
       </div>
 
 
     </nav>
 
   </section>
-

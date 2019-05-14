@@ -2,7 +2,6 @@
 <html>
 <head>
 <?php require_once(dirname(dirname(__FILE__)) . '/Include/header.php'); ?>
-<?php require_once(dirname(dirname(__FILE__)) . '/Pemodal/navbar_mhs.php'); ?>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -14,12 +13,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Tambah Usulan Baru</h1>
+                <h1>Tambah Pengajuan Pemodal</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Pengajuan Modal</li>
+                <li class="breadcrumb-item active">Pengajuan Pemodal</li>
                 </ol>
             </div>
             </div>
@@ -93,10 +92,34 @@
                 </div>
                 <div class="row" style="padding-bottom:1rem;">
                     <div class="col-3" style="padding-top:5px; text-align:left;">
+                        Foto KTP<span style="color:red;">*</span>
+                    </div>
+                    <div class="col-6">
+                    <input type="file" class="form-control-file border" name="f_ktp">
+                    </div>
+                    <div class="col-3">
+                        <span class="error_form" id="abstrak_error">
+                        </span>
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom:1rem;">
+                    <div class="col-3" style="padding-top:5px; text-align:left;">
                         File Proposal<span style="color:red;">*</span>
                     </div>
                     <div class="col-6">
-                    <input type="file" class="form-control-file border" name="hehe">
+                    <input type="file" class="form-control-file border" name="f_proposal">
+                    </div>
+                    <div class="col-3">
+                        <span class="error_form" id="abstrak_error">
+                        </span>
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom:1rem;">
+                    <div class="col-3" style="padding-top:5px; text-align:left;">
+                        File Laporan Keuangan<span style="color:red;">*</span>
+                    </div>
+                    <div class="col-6">
+                    <input type="file" class="form-control-file border" name="f_lp_keuangan">
                     </div>
                     <div class="col-3">
                         <span class="error_form" id="abstrak_error">

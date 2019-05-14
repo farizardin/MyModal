@@ -1,20 +1,5 @@
 <?php
 class Proposal_model extends CI_Model {
-
-    public function getRmk($currentSession)
-    {
-        $this->db->distinct();
-        $this->db->select('bidang.nama_bidang, bidang.id_bidang');
-        $this->db->from('bidang, departemen ,user_tabel');
-        $this->db->where('user_tabel.id_departemen = departemen.id_departemen');
-        $this->db->where('bidang.id_departemen = departemen.id_departemen');
-        $this->db->where('departemen.id_departemen',$currentSession);
-        $this->db->order_by('bidang.nama_bidang','asc');
-        
-        $query1 = $this->db->get();
-        return $query1->result();
-    }
-
     public function getDosen($currentSession)
     {
         $this->db->distinct();
@@ -29,157 +14,280 @@ class Proposal_model extends CI_Model {
         return $query1->result();
     }
 
-    public function insert_proposal($currentSessionID, $dana, $judulTA, $abstrakTA, $filename){
+    public function insert_proposal($currentSessionID, $dana, $judul, $abstrak){
         $this->db->set('id_user', $currentSessionID);
         $this->db->set('id_status', 3);
         $this->db->set('jml_dana', $dana);
-        $this->db->set('judul_nama', $judulTA);
-        $this->db->set('keterangan', $abstrakTA);
-        $this->db->set('file_proposal', $filename);
+        $this->db->set('judul_nama', $judul);
+        $this->db->set('keterangan', $abstrak);
         $this->db->set('tgl_pengajuan', 'NOW()', false);
-
-        $this->db->insert('proposal_pendanaan');
-
+        $this->db->insert('proposal_pemodal');
         $insert_id = $this->db->insert_id();
         return $insert_id;
     }
 
+    public function insert_step_two($proposal,$laporan,$ktp, $id){
+        $this->db->set('file_proposal', $proposal);
+        $this->db->set('laporan_keuangan', $laporan);
+        $this->db->set('foto_ktp', $ktp);
+        $this->db->where('id_prop_pemodal',$id);
+        $up = $this->db->update('proposal_pemodal');
+        return $up;
+    }
+
+    //proposal pending
     public function get_proposal($currentSessionID){
-        $proposal_query = sprintf("select pd.`id_ta` as id, pd.id_user as user, st.nama_status as statname, pd.id_status as status, pd.judul_nama as judul, pd.`keterangan` as abstrak, pd.jml_dana as dana from status_judul st, proposal_pendanaan pd where pd.id_user = %s and st.id_status = pd.id_status", $currentSessionID);
+        $proposal_query = sprintf("select pd.`id_prop_pemodal` as id, pd.id_user as user,pd.tgl_pengajuan as pengajuan, pd.file_proposal as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.judul_nama as judul, pd.`keterangan` as abstrak, pd.jml_dana as dana from status_judul st, proposal_pemodal pd where pd.id_user = %s and st.id_status = pd.id_status and pd.id_status = 3 order by id desc", $currentSessionID);
         $proposal_query = $this->db->query($proposal_query);
         return $proposal_query->result();
     }
-
+    //proposal diterima
     public function diterima_proposal($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE (judul_ta.id_status = 2 AND judul_ta.id_plotting = 2) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 and judul_ta.id_user = %s", $currentSessionID);
+        $proposal_query = sprintf("select pd.`id_prop_pemodal` as id, pd.id_user as user,pd.tgl_pengajuan as pengajuan, pd.file_proposal as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.judul_nama as judul, pd.`keterangan` as abstrak, pd.jml_dana as dana, (SELECT cp.judul_catatan from proposal_pemodal pm, catatan_pemodal cp where cp.id_proposal = pm.id_prop_pemodal) as catatan, (SELECT cp.keterangan from proposal_pemodal pm, catatan_pemodal cp where cp.id_proposal = pm.id_prop_pemodal) as isi from status_judul st, proposal_pemodal pd where pd.id_user = %s and st.id_status = pd.id_status and pd.id_status = 2 order by id desc", $currentSessionID);        
         $proposal_query = $this->db->query($proposal_query);
         return $proposal_query->result();
     }
-
-    public function in_confirm($dosen,$in_id){
-        $this->db->set('id_user', $dosen);
-        $this->db->set('id_ta',$in_id);
-        $this->db->set('id_konfirm', 1);
-
-        $confirm = $this->db->insert('konfirmasi');
-        return $confirm;
-    }
-
-    public function get_proposal_dosen($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE ((judul_ta.id_status = 3 AND judul_ta.id_plotting = 1) OR (judul_ta.id_status = 2 AND judul_ta.id_plotting = 1)) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 and (judul_ta.pembimbing1 = %s OR judul_ta.pembimbing2 = %s) AND (conf1.idstatdos1 = 1 OR conf2.idstatdos2 = 1);", $currentSessionID, $currentSessionID);
-        $proposal_query = $this->db->query($proposal_query);
-        return $proposal_query->result();
-    }
-
-    public function ditolak_proposal_dosen($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE ((judul_ta.id_status = 3 AND judul_ta.id_plotting = 1) OR (judul_ta.id_status = 2 AND judul_ta.id_plotting = 1)) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 and (judul_ta.pembimbing1 = %s OR judul_ta.pembimbing2 = %s) AND (conf1.idstatdos1 = 3 OR conf2.idstatdos2 = 3);", $currentSessionID, $currentSessionID);
-        $proposal_query = $this->db->query($proposal_query);
-        return $proposal_query->result();
-    }
-
-    public function diterima_proposal_dosen($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE ((judul_ta.id_status = 3 AND judul_ta.id_plotting = 1) OR (judul_ta.id_status = 2 AND judul_ta.id_plotting = 1)) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 and (judul_ta.pembimbing1 = %s OR judul_ta.pembimbing2 = %s) AND (conf1.idstatdos1 = 2 OR conf2.idstatdos2 = 2);", $currentSessionID, $currentSessionID);
-        $proposal_query = $this->db->query($proposal_query);
-        return $proposal_query->result();
-    }
-
-    public function confirmDosen($dosen,$id){
-        $this->db->where('id_user', $dosen);
-        $this->db->where('id_ta',$id);
-        $this->db->set('id_konfirm', 2);
-
-        $confirm = $this->db->update('konfirmasi');
-        return $confirm;
-    }
-
-    public function tolakDosen($dosen,$id){
-        $this->db->where('id_user', $dosen);
-        $this->db->where('id_ta',$id);
-        $this->db->set('id_konfirm', 3);
-
-        $confirm = $this->db->update('konfirmasi');
-        return $confirm;
-    }
-
-    public function get_proposal_petugas($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE (judul_ta.id_status = 3 AND judul_ta.id_plotting = 1) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 AND (conf1.idstatdos1 = 2 AND conf2.idstatdos2 = 2) AND user_tabel.id_departemen = %s;", $currentSessionID);
-        $proposal_query = $this->db->query($proposal_query);
-        return $proposal_query->result();
-    }
-
-    public function confirmPetugas($id){
-        $this->db->where('id_ta',$id);
-        $this->db->set('id_status', 2);
-
-        $confirm = $this->db->update('judul_ta');
-        return $confirm;
-    }
-
-    public function tolakPetugas($id){
-        $this->db->where('id_ta',$id);
-        $this->db->set('id_status', 1);
-
-        $confirm = $this->db->update('judul_ta');
-        return $confirm;
-    }
-
-    public function setujuKaprodi($id){
-        $this->db->where('id_ta',$id);
-        $this->db->set('id_plotting', 2);
-
-        $confirm = $this->db->update('judul_ta');
-        return $confirm;
-    }
-
-    public function ditolak_proposal_petugas($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE (judul_ta.id_status = 1 AND judul_ta.id_plotting = 1) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 AND (conf1.idstatdos1 = 2 AND conf2.idstatdos2 = 2) and user_tabel.id_departemen = %s;", $currentSessionID);
-        $proposal_query = $this->db->query($proposal_query);
-        return $proposal_query->result();
-    }
-
+    //proposal ditolak
     public function ditolak_proposal($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE (judul_ta.id_status = 1 AND judul_ta.id_plotting = 1) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 AND (conf1.idstatdos1 = 3 OR conf2.idstatdos2 = 3) and judul_ta.id_user = %s;", $currentSessionID);
+        $proposal_query = sprintf("select pd.`id_prop_pemodal` as id, pd.id_user as user,pd.tgl_pengajuan as pengajuan, pd.file_proposal as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.judul_nama as judul, pd.`keterangan` as abstrak, pd.jml_dana as dana from status_judul st, proposal_pemodal pd where pd.id_user = %s and st.id_status = pd.id_status and st.id_status = 1 order by id desc", $currentSessionID);        
         $proposal_query = $this->db->query($proposal_query);
         return $proposal_query->result();
     }
-
-    public function diterima_proposal_petugas($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE (judul_ta.id_status = 2 AND judul_ta.id_plotting = 1) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 AND (conf1.idstatdos1 = 2 AND conf2.idstatdos2 = 2) AND user_tabel.id_departemen = %s;", $currentSessionID);
+    //pengajuan
+    public function get_pengajuan($currentSessionID){
+        $proposal_query = sprintf("select pd.`id_prop_peminjam` as id, pd.id_prop_pemodal , pd.id_user as user,pd.tgl_upload as pengajuan, pd.nama_file as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.perihal as judul, pd.`abstrak` as abstrak, pd.jml_dana as dana from status_judul st, proposal_peminjam pd, proposal_pemodal pm where pd.id_prop_pemodal = pm.id_prop_pemodal and pm.id_user = %s and st.id_status = pd.id_status and pd.id_status = 3 order by id desc", $currentSessionID);
         $proposal_query = $this->db->query($proposal_query);
         return $proposal_query->result();
     }
-
-    public function get_proposal_kaprodi($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE (judul_ta.id_status = 2 AND judul_ta.id_plotting = 1) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 AND (conf1.idstatdos1 = 2 AND conf2.idstatdos2 = 2) AND user_tabel.id_departemen = %s;", $currentSessionID);
+    //pengajuan diterima
+    public function diterima_pengajuan($currentSessionID){
+        $proposal_query = sprintf("select pd.`id_prop_peminjam` as id, pd.id_prop_pemodal , pd.id_user as user,pd.tgl_upload as pengajuan, pd.nama_file as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.perihal as judul, pd.`abstrak` as abstrak, pd.jml_dana as dana from status_judul st, proposal_peminjam pd, proposal_pemodal pm where pd.id_prop_pemodal = pm.id_prop_pemodal and pm.id_user = %s and st.id_status = pd.id_status and pd.id_status = 2 order by id desc", $currentSessionID);
         $proposal_query = $this->db->query($proposal_query);
         return $proposal_query->result();
     }
-
+    //pengajuan ditolak
+    public function ditolak_pengajuan($currentSessionID){
+        $proposal_query = sprintf("select pd.`id_prop_peminjam` as id, pd.id_prop_pemodal , pd.id_user as user,pd.tgl_upload as pengajuan, pd.nama_file as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.perihal as judul, pd.`abstrak` as abstrak, pd.jml_dana as dana from status_judul st, proposal_peminjam pd, proposal_pemodal pm where pd.id_prop_pemodal = pm.id_prop_pemodal and pm.id_user = %s and st.id_status = pd.id_status and pd.id_status = 1 order by id desc", $currentSessionID);
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+    //pending proposal pemodal
+    public function get_proposal_petugas(){
+        $proposal_query = sprintf("select pd.`id_prop_pemodal` as id, pd.id_user as user,pd.tgl_pengajuan as pengajuan, pd.file_proposal as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.judul_nama as judul, pd.`keterangan` as abstrak, pd.jml_dana as dana from status_judul st, proposal_pemodal pd where st.id_status = pd.id_status and st.id_status = 3 order by id desc");
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+    //konfirmasi proposal petugas
+    public function confirmPetugas($id){
+        $this->db->where('id_prop_pemodal',$id);
+        $this->db->set('id_status', 2);
+        $this->db->set('tgl_validasi', 'NOW()', false);
+        $confirm = $this->db->update('proposal_pemodal');
+        return $confirm;
+    }
+    //tolak proposal
+    public function tolakPetugas($id){
+        $this->db->where('id_prop_pemodal',$id);
+        $this->db->set('id_status', 1);
+        $confirm = $this->db->update('proposal_pemodal');
+        return $confirm;
+    }
+    //pemodal mengkonfirmasi peminjam
+    public function confirmPemodal($id){
+        $this->db->where('id_prop_peminjam',$id);
+        $this->db->set('id_status', 2);
+        $this->db->set('tgl_validasi', 'NOW()', false);
+        $confirm = $this->db->update('proposal_peminjam');
+        return $confirm;
+    }
+    //pemodal tolak peminjam
+    public function tolakPemodal($id){
+        $this->db->where('id_prop_pemodal',$id);
+        $this->db->set('id_status', 1);
+        $confirm = $this->db->update('proposal_peminjam');
+        return $confirm;
+    }
+    //get proposal ditolak petugas
+    public function ditolak_proposal_petugas(){
+        $proposal_query = sprintf("select pd.`id_prop_pemodal` as id, pd.id_user as user,pd.tgl_pengajuan as pengajuan, pd.file_proposal as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.judul_nama as judul, pd.`keterangan` as abstrak, pd.jml_dana as dana from status_judul st, proposal_pemodal pd where st.id_status = pd.id_status and st.id_status = 1 order by id desc");
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+    //get proposal diterima petugas
+    public function diterima_proposal_petugas(){
+        $proposal_query = sprintf("select pd.`id_prop_pemodal` as id, pd.id_user as user,pd.tgl_pengajuan as pengajuan, pd.file_proposal as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.judul_nama as judul, pd.`keterangan` as abstrak, pd.jml_dana as dana from status_judul st, proposal_pemodal pd where st.id_status = pd.id_status and st.id_status = 2 order by id desc");
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+    //insert catatan pemodal
     public function Catatan($id,$currentSessionID,$JudulCatatan,$Catatan){
         $this->db->set('id_user', $currentSessionID);
-        $this->db->set('id_ta', $id);
+        $this->db->set('id_proposal', $id);
+        $this->db->set('judul_catatan', $JudulCatatan);
+        $this->db->set('keterangan', $Catatan);
+        $this->db->insert('catatan_pemodal');
+    }
+    //insert catatan peminjam
+    public function CatatanPeminjam($id,$currentSessionID,$JudulCatatan,$Catatan){
+        $this->db->set('id_user', $currentSessionID);
+        $this->db->set('id_prop_peminjam', $id);
         $this->db->set('judul_catatan', $JudulCatatan);
         $this->db->set('catatan_isi', $Catatan);
-
-        $this->db->insert('catatan');
+        $this->db->insert('catatan_peminjam');
     }
-
-    public function setuju_proposal_kaprodi($currentSessionID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, user_tabel.username as usrname, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE (judul_ta.id_status = 2 AND judul_ta.id_plotting = 2) and judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 AND (conf1.idstatdos1 = 2 AND conf2.idstatdos2 = 2) AND user_tabel.id_departemen = %s;", $currentSessionID);
+    //verifikasi transfer pemodal
+    public function Pencairan($id,$dana){
+        $this->db->set('id_prop_peminjam', $id);
+        $this->db->set('jml_dana', $dana);
+        $this->db->set('id_verifikasi',3);
+        $this->db->insert('pencairan');
+        $insert_id = $this->db->insert_id();
+        return $insert_id;
+    }
+    //insert bukti pemodal
+    public function insertBukti($id,$buktiTransfer){
+        $this->db->set('bukti_transfer', $buktiTransfer);
+        $this->db->where('id_pencairan', $id);
+        $up = $this->db->update('pencairan');
+        return $up;
+    }
+    //konfirm pengajuan peminjam
+    public function confirmPengajuan($id){
+        $this->db->set('id_status', 2);
+        $this->db->set('tgl_diterima', 'NOW()', false);
+        $this->db->where('id_prop_peminjam',$id);
+        $confirm = $this->db->update('proposal_peminjam');
+    }
+    //tolak peminjam
+    public function tolakPeminjam($id){
+        $this->db->where('id_prop_peminjam',$id);
+        $this->db->set('id_status', 1);
+        $confirm = $this->db->update('proposal_peminjam');
+        return $confirm;
+    }
+    //detail proposal
+    public function get_detail_proposal($currentProposalID){
+        $proposal_query = sprintf("select pm.id_prop_pemodal as id, us.nama_user as nama, st.nama_status as stats, pm.judul_nama as judul, pm.keterangan as ket, pm.jml_dana as dana, pm.tgl_pengajuan as pengajuan, pm.file_proposal as fileProp, pm.tgl_validasi as validasi, pm.foto_ktp as fileKtp, pm.laporan_keuangan as fileLap FROM proposal_pemodal pm, user_tabel us, status_judul st WHERE pm.id_user = us.id_user and pm.id_status = st.id_status and pm.id_prop_pemodal = %s ;",$currentProposalID);
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->row();
+    }
+    //proposal pemodal masuk
+    public function get_proposal_masuk($currentProposalID){
+        $proposal_query = sprintf("select pd.`id_prop_peminjam` as id, pd.id_prop_pemodal , pd.id_user as user,pd.tgl_upload as pengajuan, pd.nama_file as fileProp, pd.foto_ktp as fileKtp, pd.laporan_keuangan as fileLap, st.nama_status as statname, pd.id_status as status, pd.perihal as judul, pd.`abstrak` as abstrak, pd.jml_dana as dana from status_judul st, proposal_peminjam pd, proposal_pemodal pm where pd.id_prop_pemodal = pm.id_prop_pemodal and pm.id_user = %s and st.id_status = pd.id_status and pd.id_status = 3 order by id desc;",$currentProposalID);
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->row();
+    }
+    //hapus catatan
+    public function hapusCatatan($currentProposalID){
+        $this->db->where('id_proposal',$currentProposalID);
+        return $this->db->delete('catatan_pemodal');
+    }
+    //hapus penawaran
+    public function hapusPenawaran($currentProposalID){
+        $this->db->where('id_prop_pemodal',$currentProposalID);
+        return $this->db->delete('proposal_pemodal');
+    }
+    //get pencairan admin pending
+    public function get_pencairan(){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pencairan as id,pn.jml_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as pengirim, t.usr as tertuju FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pencairan pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and ver.id_verifikasi = 3;");
         $proposal_query = $this->db->query($proposal_query);
         return $proposal_query->result();
     }
 
-    public function get_detail_proposal($currentProposalID){
-        $proposal_query = sprintf("select distinct judul_ta.id_ta as id,status_judul.id_status as status_id, status_plotting.id_plotting as plotting_id, status_plotting.nama_plotting as plotting, status_judul.nama_status as status, user_tabel.nama_user as user, test.dosen1, test2.dosen2, conf1.statusdosen1, conf2.statusdosen2, conf1.idstatdos1, conf2.idstatdos2, judul_ta.judul_nama as judul, judul_ta.keterangan as keterangan, bidang.nama_bidang as nama from status_plotting, judul_ta, user_tabel, status_judul, bidang, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen1 FROM user_tabel WHERE user_tabel.id_role = 2) test, (SELECT user_tabel.id_user, user_tabel.nama_user as dosen2 FROM user_tabel WHERE user_tabel.id_role = 2) test2, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us1, status_dosen.nama_status as statusdosen1, status_dosen.id_konfirm as idstatdos1, judul_ta.id_ta as ta1 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing1 and konfirmasi.id_ta = judul_ta.id_ta) conf1, (SELECT konfirmasi.id_konfirm, konfirmasi.id_user as us2, status_dosen.nama_status as statusdosen2, status_dosen.id_konfirm as idstatdos2, judul_ta.id_ta as ta2 FROM konfirmasi, judul_ta, status_dosen WHERE konfirmasi.id_konfirm = status_dosen.id_konfirm and konfirmasi.id_user = judul_ta.pembimbing2 and konfirmasi.id_ta = judul_ta.id_ta) conf2 WHERE judul_ta.id_status = status_judul.id_status and judul_ta.id_bidang = bidang.id_bidang and judul_ta.id_user = user_tabel.id_user and judul_ta.id_plotting = status_plotting.id_plotting and test.id_user = judul_ta.pembimbing1 and test2.id_user = judul_ta.pembimbing2 and judul_ta.pembimbing1 = conf1.us1 and judul_ta.pembimbing2 = conf2.us2 and judul_ta.id_ta = conf1.ta1 and judul_ta.id_ta = conf2.ta2 and judul_ta.id_ta = %s", $currentProposalID);
+    //get pencairan admin verified
+    public function get_pencairan_verifikasi(){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pencairan as id,pn.jml_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as pengirim, t.usr as tertuju FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pencairan pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and ver.id_verifikasi = 2;");
         $proposal_query = $this->db->query($proposal_query);
-        return $proposal_query->row();
+        return $proposal_query->result();
     }
-    public function get_catatan_proposal($currentProposalID){
-        $this->db->select('*');
-        $this->db->from('*');
-        $this->db->where('id_ta',$currentProposalID);
+    //dana keluar pemodal
+    public function get_pencairan_user($currentSessionID){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pencairan as id,pn.jml_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as pengirim, t.usr as tertuju FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pencairan pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and pm.id_user = %s",$currentSessionID);
         $proposal_query = $this->db->query($proposal_query);
-        return $proposal_query->row();
+        return $proposal_query->result();
+    }
+
+    //dana masuk peminjam
+    public function get_pencairan_peminjam($currentSessionID){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pencairan as id,pn.jml_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as pengirim, t.usr as tertuju FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pencairan pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and pj.id_user = %s",$currentSessionID);
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+
+    //get pengembalian admin pending
+    public function get_pengembalian(){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pengembalian as id,pn.jumlah_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as tertuju, t.usr as pengirim FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pengembalian pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and ver.id_verifikasi = 3;;");
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+
+    //get pengembalian admin verified
+    public function get_pengembalian_verifikasi(){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pengembalian as id,pn.jumlah_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as tertuju, t.usr as pengirim FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pengembalian pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and ver.id_verifikasi = 2;");
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+
+    public function get_pengembalian_user($currentSessionID){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pengembalian as id,pn.jumlah_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as tertuju, t.usr as pengirim FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pengembalian pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and ver.id_verifikasi = 2 and pm.id_user = %s",$currentSessionID);
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+
+    public function get_pengembalian_peminjam($currentSessionID){
+        $proposal_query = sprintf("select DISTINCT pn.bukti_transfer as bukti, pn.id_pengembalian as id,pn.jumlah_dana as dana, pn.bukti_transfer as bukti, ver.status_verifikasi as stats, p.pengirim as tertuju, t.usr as pengirim FROM verifikasi ver, proposal_peminjam pj, proposal_pemodal pm, pengembalian pn, user_tabel us, (select us.nama_user as pengirim from user_tabel us, proposal_pemodal pm where pm.id_user = us.id_user) p,(select us.nama_user as usr from user_tabel us, proposal_peminjam pm where pm.id_user = us.id_user) t WHERE pn.id_prop_peminjam = pj.id_prop_peminjam and ver.id_verifikasi = pn.id_verifikasi and ver.id_verifikasi = 2 and pj.id_user = %s",$currentSessionID);
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+
+    //verifikasi transaksi
+    public function verification($id,$currentSessionID){
+        $this->db->set('id_verifikasi', 2);
+        $this->db->set('id_user', $currentSessionID);
+        $this->db->where('id_pencairan',$id);
+        $confirm = $this->db->update('pencairan');
+        return $confirm;
+    }
+    //
+    public function verPeminjam($id,$currentSessionID){
+        $this->db->set('id_verifikasi', 2);
+        $this->db->set('id_user', $currentSessionID);
+        $this->db->where('id_pengembalian',$id);
+        $confirm = $this->db->update('pengembalian');
+        return $confirm;
+    }
+    //
+    public function danakembali($id){
+        $this->db->select('jumlah_dana');
+        $this->db->from('pengembalian');
+        $this->db->where('id_pengembalian',$id);
+        return $this->db->get()->row();
+    }
+    //
+    public function PemasukanPemodal($id,$dana){
+        $this->db->set('id_prop_peminjam', $id);
+        $this->db->set('dana_masuk', $dana);
+        $this->db->insert('pemasukan_pemodal');
+        $insert_id = $this->db->insert_id();
+        return $insert_id;
+    }
+    //
+    public function PemasukanPerusahaan($id,$dana){
+        $this->db->set('id_prop_peminjam', $id);
+        $this->db->set('dana_masuk', $dana);
+        $this->db->insert('pemasukan_perusahaan');
+        $insert_id = $this->db->insert_id();
+        return $insert_id;
+    }
+    //Get User
+    public function get_user_data(){
+        $proposal_query = sprintf("select ut.nama_user, ut.id_user, ut.username, ut.alamat, ur.nama_role from user_tabel ut, user_role ur where ut.id_role = ur.id_role");
+        $proposal_query = $this->db->query($proposal_query);
+        return $proposal_query->result();
+    }
+    //Hapus User
+    public function hapusUser($idUser){
+        $this->db->where('id_user',$idUser);
+        return $this->db->delete('user_tabel');
     }
 }

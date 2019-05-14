@@ -2,7 +2,6 @@
 <html>
 <head>
 <?php require_once(dirname(dirname(__FILE__)) . '/Include/header.php'); ?>
-<?php require_once(dirname(dirname(__FILE__)) . '/Dosen/navbar_dosen.php'); ?>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -15,12 +14,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Konfirmasi Proposal</h1>
+                <h1>Proposal Ditolak</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Konfirmasi Proposal</li>
+                <li class="breadcrumb-item active">Proposal Ditolak</li>
                 </ol>
             </div>
             </div>
@@ -84,7 +83,7 @@
                     </div>
                 <?php } ?>
                 <div class="card-header">
-                <h3 class="card-title">Konfirmasi Proposal</h3>
+                <h3 class="card-title">Proposal Ditolak</h3>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
@@ -131,12 +130,12 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Proposal</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Proposal Ditolak</h5>
                             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                             </button>
                         </div>
-                        <div class="modal-body">Apakah anda yakin untuk mengkonfirmasi proposal ini?</div>
+                        <div class="modal-body">Apakah anda yakin untuk mengProposal Ditolak ini?</div>
                         <div class="modal-footer">
                             <a id="btn-confirm" class="btn btn-primary" href="#">Konfirmasi</a>
                             <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>

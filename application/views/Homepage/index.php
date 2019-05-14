@@ -23,7 +23,7 @@
                 MyModal</h1>
                 
 <br>
-                <div class="mbr-section-btn"><a class="btn btn-md btn-white-outline display-4" href="<?php echo site_url("Home/profile"); ?>">PROFIL</a></div>
+                <div class="mbr-section-btn"><a class="btn btn-md btn-white-outline display-4" href="<?php echo site_url("Home/profile"); ?>">Cari Pemodal</a></div>
             </div>
         </div>
     </div>
@@ -32,38 +32,6 @@
             <i class="mbri-down mbr-iconfont"></i>
         </a>
     </div>
-</section>
-<section style="height:10px;">
-</section>
-<section class="testimonials4 cid-qYU7efzH2o" id="testimonials4-1p">
-  <div class="container">
-    <div class="col-md-10 testimonials-container"> 
-    <div class="testimonials-item">
-    <?php foreach ($getBerita->result() as $row)
-                {
-          ?> 
-        <div class="user row">
-          <div class="col-lg-3 col-md-4">
-            <div class="user_image">
-              <img src="assets/images/images-225x225.png" alt="" title="">
-            </div>
-          </div>
-             
-                <div class="testimonials-caption col-lg-9 col-md-8">
-                <div class="user_name mbr-bold mbr-fonts-style align-left pt-3 display-7"><a href="BeritaDetail.html"><strong><?php echo $row->judul_berita ?></strong></a></div>
-                  <div class="user_text ">
-                    <p class="mbr-fonts-style  display-7">
-                      <em>"<?php echo $row->isi_berita ?>"</em>
-                    </p>
-                  </div>
-                  <div class="user_desk mbr-light mbr-fonts-style align-left pt-2 display-7">
-                    <?php echo $row->nama_user ?></div>
-                </div>
-              </div>  
-              <?php
-                }
-                ?>
-  </div>
 </section>
 
 </body>

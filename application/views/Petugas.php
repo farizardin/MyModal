@@ -7,7 +7,6 @@
 <div class="wrapper">
 
   <!-- Navbar -->
-  <?php require_once 'Petugas/navbar_petugas.php' ?>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" style="min-height: 450px !important;">
@@ -34,8 +33,8 @@
               <a class="dashboard-panel" href="<?php echo site_url('Admin/ProposalMasuk'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
                 <div class="col-md-1 content-da" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
                   <div>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Proposal</h2>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Pendanaan Masuk</h2>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pemodal</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Masuk</h3>
                   </div>
                   <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
                   </div>
@@ -43,11 +42,11 @@
                   </div>
                 </div>
               </a>
-              <a class="dashboard-panel" href="<?php echo site_url('Proposal/Disetujui'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+              <a class="dashboard-panel" href="<?php echo site_url('Admin/ProposalDisetujui'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
                 <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
                   <div>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Proposal</h2>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Pendanaan Disetujui</h2>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pemodal</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Disetujui</h3>
                   </div>
                   <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
                   </div>
@@ -58,8 +57,8 @@
               <a class="dashboard-panel" href="<?php echo site_url('Admin/ProposalDitolak'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
                 <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
                   <div>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Proposal</h2>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Pendanaan Ditolak</h2>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pemodal</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Ditolak</h3>
                   </div>
                   <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
                   </div>
@@ -67,11 +66,11 @@
                   </div>
                 </div>
               </a>
-              <a class="dashboard-panel" href="<?php echo site_url('Admin/ProposalMasuk'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
-                <div class="col-md-1 content-da" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+              <a class="dashboard-panel" href="<?php echo site_url('Admin/PencairanPending'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
                   <div>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Proposal</h2>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Pengajuan Masuk</h2>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pencairan</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pending</h3>
                   </div>
                   <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
                   </div>
@@ -79,23 +78,59 @@
                   </div>
                 </div>
               </a>
-              <a class="dashboard-panel" href="<?php echo site_url('Admin/Disetujui'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+              <a class="dashboard-panel" href="<?php echo site_url('Admin/PencairanVerified'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
                 <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
                   <div>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Proposal</h2>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Pengajuan Disetujui</h2>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pencairan</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Verified</h3>
                   </div>
                   <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
                   </div>
                   <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
                   </div>
-              </div>
+                </div>
               </a>
-              <a class="dashboard-panel" href="<?php echo site_url('Admin/ProposalDitolak'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+              <a class="dashboard-panel" href="<?php echo site_url('Admin/PengembalianPending'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
                 <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
                   <div>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Proposal</h2>
-                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Pendanaan Ditolak</h2>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pengembalian</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pending</h3>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Admin/PengembalianVerified'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pengembalian</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Verified</h3>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Admin/Pemasukan'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Pemasukan</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Perusahaan</h3>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Admin/ManajemenUser'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">Manajemen</h3>
+                    <h3 style="margin-top:auto; color:white; font-weight: bold;">User</h3>
                   </div>
                   <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
                   </div>

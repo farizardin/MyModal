@@ -2,7 +2,6 @@
 <html>
 <head>
 <?php require_once(dirname(dirname(__FILE__)) . '/Include/header.php'); ?>
-<?php require_once(dirname(dirname(__FILE__)) . '/Mahasiswa/navbar_mhs.php'); ?>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">

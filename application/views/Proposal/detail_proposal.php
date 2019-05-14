@@ -2,7 +2,6 @@
 <html>
 <head>
 <?php require_once(dirname(dirname(__FILE__)) . '/Include/header.php'); ?>
-<?php require_once(dirname(dirname(__FILE__)) . '/Mahasiswa/navbar_mhs.php'); ?>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -37,10 +36,7 @@
                 <div clas="row" style="margin-top:2rem;margin-bottom:2rem;">
                     <div class="col" style="margin:auto;">
                     <div class="tab">
-                        <button class="tablinks" onclick="openTab(event, 'info')" id="defaultOpen">Informasi dan Status</button>
-                        <button class="tablinks" onclick="openTab(event, 'data')">Catatan</button>
-                        <button class="tablinks" onclick="openTab(event, 'seminar')">Seminar</button>
-                        <button class="tablinks" onclick="openTab(event, 'sidang')">Proposal Sidang</button>
+                        <button class="tablinks" onclick="openTab(event, 'info')" id="defaultOpen">Informasi</button>
                     </div>
                     </div>
                 </div>
@@ -48,10 +44,10 @@
                     <table class="table" width="100%">
                                 <tbody>
                                     <tr>
-                                        <th style="width:30%">Nama Mahasiswa</th>
+                                        <th style="width:30%">Nama Pengaju</th>
                                         <th style="width:5%">:</th>
                                         <td>
-                                        <?php echo $proposal_data->user?>
+                                        <?php echo $proposal_data->nama?>
                                         </td>
                                     </tr>
                                     <tr>
@@ -62,53 +58,45 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th style="width:30%">Bidang</th>
+                                        <th style="width:30%">Jumlah Dana</th>
                                         <th style="width:5%">:</th>
                                         <td>
-                                        <?php echo $proposal_data->nama?>
+                                        <?php echo $proposal_data->dana?>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th style="width:30%">Abstrak</th>
+                                        <th style="width:30%">Keterangan</th>
                                         <th style="width:5%">:</th>
                                         <td>
-                                        <?php echo $proposal_data->keterangan ?>
+                                        <?php echo $proposal_data->ket ?>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th style="width:30%">Dosen 1</th>
+                                        <th style="width:30%">Status Proposal</th>
                                         <th style="width:5%">:</th>
                                         <td>
-                                        <?php echo $proposal_data->dosen1.' (<i>'.$proposal_data->statusdosen1.'</i>)'?> 
+                                        <?php echo "<i>'$proposal_data->stats.'</i>"?> 
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th style="width:30%">Dosen 2</th>
+                                        <th style="width:30%">KTP</th>
                                         <th style="width:5%">:</th>
                                         <td>
-                                        <?php echo $proposal_data->dosen2.' (<i>'.$proposal_data->statusdosen2.'</i>)'?> 
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th style="width:30%">Status</th>
-                                        <th style="width:5%">:</th>
-                                        <td>
-                                        <?php if(($proposal_data->idstatdos1 == 1 || $proposal_data->idstatdos2 == 1)){
-                                    echo '<i>Menunggu Konfirmasi Dosen</i>';
-                                }
-                                elseif($proposal_data->idstatdos1 == 2 && $proposal_data->idstatdos2 == 2 && $proposal_data->status_id == 3 && $proposal_data->plotting_id == 1)
-                                {
-                                  echo $proposal_data->status;
-                                }elseif($proposal_data->idstatdos1 == 2 && $proposal_data->idstatdos2 == 2 && $proposal_data->status_id == 2 && $proposal_data->plotting_id = 1){
-                                    echo $proposal_data->plotting;
-                                }?>
+                                             <a target="_blank" href="<?php echo base_url($proposal_data->fileKtp);?>">File KTP</a>
                                         </td>
                                     </tr>
                                     <tr>
                                         <th style="width:30%">Proposal</th>
                                         <th style="width:5%">:</th>
                                         <td>
-                                             <a href="" download>Download Proposal</a>
+                                             <a target="_blank" href="<?php echo base_url($proposal_data->fileProp);?>">File Proposal</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:30%">Laporan Keuangan</th>
+                                        <th style="width:5%">:</th>
+                                        <td>
+                                             <a target="_blank" href="<?php echo base_url($proposal_data->fileLap);?>">File Laporan Keuangan</a>
                                         </td>
                                     </tr>
                                 </tbody>

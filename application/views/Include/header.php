@@ -105,3 +105,19 @@ body {font-family: Arial;}
   to {opacity: 1;}
 }
 </style>
+<?php 
+  switch ($this->session->id_role) {
+    
+    case 1:
+      $this->load->view('Include/navbar_pemodal');
+      break;
+    case 2:
+      $this->load->view('Include/navbar_peminjam');
+      break;
+    case 3:
+      $this->load->view('Include/navbar_petugas');
+      break;
+  }
+
+  
+?>

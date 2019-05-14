@@ -7,7 +7,6 @@
 <div class="wrapper">
 
   <!-- Navbar -->
-  <?php require_once 'Pemodal/navbar_mhs.php' ?>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" style="min-height: 450px !important;">
@@ -29,8 +28,8 @@
     </div>
     <section class="content">
       <div class="container-fluid">
-            <div class="row dashboard-pemodal" style="margin-top:10%;">
-              <a class="dashboard-panel" href="<?php echo site_url('Pemodal/PengajuanJudul'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+            <div class="row dashboard-petugas" style="margin-top:2%;">
+              <a class="dashboard-panel" href="<?php echo site_url('Pemodal/PengajuanPemodal'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
                 <div class="col-md-1 content-da" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
                   <div>
                     <h2 style="margin-top:auto; color:white; font-weight: bold;">Pengajuan</h2>
@@ -71,6 +70,66 @@
                   <div>
                     <h2 style="margin-top:auto; color:white; font-weight: bold;">Proposal</h2>
                     <h2 style="margin-top:auto; color:white; font-weight: bold;">Ditolak</h2>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Pemodal/PengajuanMasuk'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Peminjaman</h2>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Masuk</h2>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Pemodal/PengajuanDiterima'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Peminjaman</h2>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Diterima</h2>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Pemodal/PengajuanDitolak'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Peminjaman</h2>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Ditolak</h2>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Pemodal/DanaMasuk'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Dana</h2>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Masuk</h2>
+                  </div>
+                  <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
+                  </div>
+                  <div class="bar2" style="height:0.1rem; width:10rem; background-color:orange;">
+                  </div>
+                </div>
+              </a>
+              <a class="dashboard-panel" href="<?php echo site_url('Pemodal/DanaKeluar'); ?>" style="background-color:DodgerBlue; margin: auto; margin-top:1rem; margin-bottom:1rem; height: 14rem;">
+                <div class="col-md-1" style="width:14rem; height: 14rem; padding-top:25%; padding-left:2rem;">
+                  <div>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Dana</h2>
+                    <h2 style="margin-top:auto; color:white; font-weight: bold;">Keluar</h2>
                   </div>
                   <div class="bar1" style="; height:0.2rem; width:3rem; background-color:orange;">
                   </div>

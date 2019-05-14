@@ -2,7 +2,6 @@
 <html>
 <head>
 <?php require_once(dirname(dirname(__FILE__)) . '/Include/header.php'); ?>
-<?php require_once(dirname(dirname(__FILE__)) . '/Petugas/navbar_petugas.php'); ?>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -15,12 +14,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Konfirmasi Proposal</h1>
+                <h1>Proposal Masuk</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Konfirmasi Proposal</li>
+                <li class="breadcrumb-item active">Proposal Masuk</li>
                 </ol>
             </div>
             </div>
@@ -84,7 +83,7 @@
                     </div>
                 <?php } ?>
                 <div class="card-header">
-                <h3 class="card-title">Konfirmasi Proposal</h3>
+                <h3 class="card-title">Proposal Masuk</h3>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
@@ -99,32 +98,28 @@
                     </thead>
                     <tbody> 
                     
-                    <?php $i = 1; foreach($proposal_data_dos as $row){   ?>                       
+                    <?php $i = 1; foreach($proposal_data as $row){   ?>                       
                     <tr>
                        <td style="vertical-align:middle;"><?php echo $i; ?></td>
                         <td style=" text-align:left; ">
-                            <p>
-                                <b>NAMA</b>: <?php echo $row->user?><br>
-                                <b>NRP</b>: <?php echo $row->usrname?><br>
-                                <b>JUDUL</b>: <?php echo $row->judul?><br>
-                                <b>BIDANG</b>: <?php echo $row->nama?><br>
-                                <b>STATUS</b>: <i><?php echo $row->status
-                                ?></i><br>
-                                <b>Pembimbing 1</b>: <?php echo $row->dosen1.' (<i>'.$row->statusdosen1.'</i>)'?> <br>
-                                <b>Pembimbing 2</b>: <?php echo $row->dosen2.' (<i>'.$row->statusdosen2.'</i>)'?> <br>
+                            <p><b>JUDUL</b>: <?php echo $row->judul?><br>
+                                <b>STATUS</b>: <?php echo $row->statname?><i></i><br>
+                                <b>DANA</b>: <?php echo $row->dana?><br>
+                                <b>Foto KTP</b>: <a target="_blank" href="<?php echo base_url($row->fileKtp);?>">Lihat KTP</a><br>
+                                <b>File Proposal</b>: <a href="<?php echo base_url($row->fileProp);?>" download>Download Proposal</a><br>
+                                <b>Laporan Keuangan</b>: <a href="<?php echo base_url($row->fileLap);?>" download>Download Laporan Keuangan</a><br>
                             </p>
                         </td>
                         <td style="vertical-align:middle;">
-                            <?php echo $row->keterangan ?>
+                            <?php echo $row->abstrak ?>
                         </td>
                         <td style="vertical-align:middle; ">
-                        <form method="post" action="<?php echo site_url('Mahasiswa/DetailProposal')?>">
+                        <form method="post" action="<?php echo site_url('Admin/DetailProposal/'.$row->id)?>">
                                 <input type="hidden" name="id_proposal" value="<?php echo $row->id?>">
                                 <button type="submit" class="btn btn-primary btn-sm" style="border-radius:0px !important;" title="Detail">Detail </button>
-                                <a onclick="proposalConfirm('<?php echo site_url('Petugas/ConfirmProposal/'.$row->id) ?>')"href="#!" style="border-radius:0px !important;" class="btn btn-success btn-sm"></i>Terima</a>
-                                <a onclick="deleteConfirm('<?php echo site_url('Petugas/TolakProposal/'.$row->id) ?>')"href="#!" style="border-radius:0px !important;" class="btn btn-danger btn-sm"></i>Tolak</a>
+                                <a onclick="proposalConfirm('<?php echo site_url('Admin/ConfirmProposal/'.$row->id) ?>')"href="#!" style="border-radius:0px !important;" class="btn btn-success btn-sm"></i>Terima</a>
+                                <a onclick="deleteConfirm('<?php echo site_url('Admin/TolakProposal/'.$row->id) ?>')"href="#!" style="border-radius:0px !important;" class="btn btn-danger btn-sm"></i>Tolak</a>
                             </form>
-                                
                         </td>
                     </tr>
                     <?php $i++;} ?>   
@@ -135,12 +130,12 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Proposal</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Proposal Masuk</h5>
                             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                             </button>
                         </div>
-                    <div class="modal-body">Apakah anda yakin untuk mengkonfirmasi proposal ini?</div>
+                    <div class="modal-body">Apakah anda yakin untuk mengProposal Masuk ini?</div>
                         <form id="msform" class="form-group" action="" method="post">
             <!-- fieldsets -->
                             <div class="row" style="margin-left:2rem;padding-bottom:1rem;">
@@ -166,22 +161,22 @@
                 <!-- /.card-body -->
             </div>
             <div class="modal fade" id="tolakModal" tabindex="1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Proposal</h5>
-                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">Apakah anda yakin untuk menolak proposal ini?</div>
-                                <div class="modal-footer">
-                                    <a id="btn-tolak" class="btn btn-danger" href="#">Tolak</a>
-                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                </div>
-                                </div>
-                            </div>
-                         </div>
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Proposal Masuk</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">Apakah anda yakin untuk menolak proposal ini?</div>
+                        <div class="modal-footer">
+                            <a id="btn-tolak" class="btn btn-danger" href="#">Tolak</a>
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
                     </div>
             <!-- /.card -->
             </div>
